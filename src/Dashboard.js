@@ -172,7 +172,7 @@ const DashboardContent = ({ onLogout }) => {
     const loadData = async () => {
       try {
         const SHEET_ID = '1Oam7QAlxDWzlCw8MkFXdl50wHWBkXu1-RrOsU-DhwEc';
-        const SHEET_GID = '1333445888';
+        const SHEET_GID = '1578308633';
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
         
         const response = await fetch(url);
