@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import Papa from 'papaparse';
 import _ from 'lodash';
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#ff0000', '#00ff00', '#0088aa', '#aa0088', '#88aa00'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#ff0000', '#00ff00'];
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
@@ -146,15 +146,6 @@ const CityChart = ({ data, city, selectedVars }) => {
             {selectedVars.nac_alladj_total && (
               <Line type="monotone" dataKey="nac_alladj_total" stroke={COLORS[5]} name="NAC All Adj Total" dot={false} />
             )}
-            {selectedVars.totalreportingsdp_imp2 && (
-              <Line type="monotone" dataKey="totalreportingsdp_imp2" stroke={COLORS[6]} name="Total Reporting SDP Imp2" dot={false} />
-            )}
-            {selectedVars.nac_wraadj_total_imp2 && (
-              <Line type="monotone" dataKey="nac_wraadj_total_imp2" stroke={COLORS[7]} name="NAC WRA Adj Total Imp2" dot={false} />
-            )}
-            {selectedVars.nac_alladj_total_imp2 && (
-              <Line type="monotone" dataKey="nac_alladj_total_imp2" stroke={COLORS[8]} name="NAC All Adj Total Imp2" dot={false} />
-            )}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -174,17 +165,14 @@ const DashboardContent = ({ onLogout }) => {
     totalreportingsdp: true,
     nac_wraadj_total: true,
     nac_alladj_total_imp: true,
-    nac_alladj_total: true,
-    totalreportingsdp_imp2: true,
-    nac_wraadj_total_imp2: true,
-    nac_alladj_total_imp2: true
+    nac_alladj_total: true
   });
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const SHEET_ID = '1Oam7QAlxDWzlCw8MkFXdl50wHWBkXu1-RrOsU-DhwEc';
-        const SHEET_GID = '1578308633';
+        const SHEET_ID = '1lcU9KEq9jpON6d1-5ojDgDMcdLmcKrUVPG1GQENb2bk';
+        const SHEET_GID = '1631110357';
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
         
         const response = await fetch(url);
