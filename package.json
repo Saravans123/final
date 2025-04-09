@@ -2,7 +2,7 @@
   "name": "board",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://Saravans123.github.io/final/",
+  "homepage": "https://Saravans123.github.io/final",
   "dependencies": {
     "cra-template": "1.2.0",
     "debug": "^4.4.0",
