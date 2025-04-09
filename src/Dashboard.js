@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import Papa from 'papaparse';
 import _ from 'lodash';
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#ff0000', '#00ff00'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ffc658'];
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
@@ -68,6 +68,68 @@ const LoginScreen = ({ onLogin }) => {
   );
 };
 
+const CityMetadata = ({ cityData }) => {
+  // Get the first row of city data which should contain metadata
+  const metadata = cityData[0] || {};
+  
+  // Format numbers as needed
+  const formatNumber = (value, decimals = 0) => {
+    if (value === null || value === undefined) return 'N/A';
+    return Number(value).toFixed(decimals);
+  };
+  
+  return (
+    <div className="mb-4 grid grid-cols-2 md:grid-cols-3 gap-2 bg-gray-50 p-3 rounded">
+      <div className="text-sm">
+        <span className="font-medium">Monthly increase in net contraceptive uptake per 1000 WRA during TCI:</span> 
+        <span className="ml-1">{metadata.NCU_per_1000_grad ? formatNumber(metadata.NCU_per_1000_grad, 2) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Monthly increase in net contraceptive uptake per 1000 WRA after graduation:</span> 
+        <span className="ml-1">{metadata.NCU_per_1000_post ? formatNumber(metadata.NCU_per_1000_post, 2) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Monthly increase in net contraceptive uptake during TCI:</span> 
+        <span className="ml-1">{metadata.NCU_total_grad ? formatNumber(metadata.NCU_total_grad) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Monthly increase in net contraceptive uptake after graduation:</span> 
+        <span className="ml-1">{metadata.NCU_total_post ? formatNumber(metadata.NCU_total_post) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Final difference in NAC by graduation:</span> 
+        <span className="ml-1">{metadata.NCU_final_grad ? formatNumber(metadata.NCU_final_grad) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Final difference in NAC by the end of series:</span> 
+        <span className="ml-1">{metadata.NCU_final_period ? formatNumber(metadata.NCU_final_period) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Integration:</span> 
+        <span className="ml-1">{metadata.integration || 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">Whitenoise P-value (Ho: Residuals follow a whitenoise process):</span> 
+        <span className="ml-1">{metadata.whitnoise_pmlb_p ? Number(metadata.whitnoise_pmlb_p).toFixed(3) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">TCI impact p-value:</span> 
+        <span className="ml-1">{metadata.ramp_p_bt ? Number(metadata.ramp_p_bt).toFixed(3) : 'N/A'}</span>
+      </div>
+      <div className="text-sm">
+        <span className="font-medium">After graduation impact p-value:</span> 
+        <span className="ml-1">{metadata.int_p_bt ? Number(metadata.int_p_bt).toFixed(3) : 'N/A'}</span>
+      </div>
+      <div className="text-sm col-span-2">
+        <span className="font-medium">AR/MA terms:</span> 
+        <span className="ml-1">
+          {metadata.ar !== undefined && metadata.ma !== undefined ? `AR(${metadata.ar}), MA(${metadata.ma})` : 'N/A'}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 const CityChart = ({ data, city, selectedVars }) => {
   const impDate = data[0]?.impdate;
   const gradDate = data[0]?.graduationdate;
@@ -75,6 +137,7 @@ const CityChart = ({ data, city, selectedVars }) => {
   return (
     <div className="mb-8 border rounded p-4">
       <h3 className="text-lg font-medium mb-2">{city}</h3>
+      <CityMetadata cityData={data} />
       <div style={{ height: '400px' }}>
         <ResponsiveContainer>
           <LineChart data={data}>
@@ -128,23 +191,46 @@ const CityChart = ({ data, city, selectedVars }) => {
                 dy: 50
               }} 
             />
-            {selectedVars.nac_wraadj_total_imp && (
-              <Line type="monotone" dataKey="nac_wraadj_total_imp" stroke={COLORS[0]} name="NAC Wrap Adj Total (Imp)" dot={false} />
-            )}
             {selectedVars.totalreportingsdp_imp && (
-              <Line type="monotone" dataKey="totalreportingsdp_imp" stroke={COLORS[1]} name="Total Reporting SDP (Imp)" dot={false} />
+              <Line 
+                type="monotone" 
+                dataKey="totalreportingsdp_imp" 
+                stroke={COLORS[0]} 
+                strokeWidth={2}
+                name="Total reporting SDPs" 
+                dot={false} 
+              />
             )}
-            {selectedVars.totalreportingsdp && (
-              <Line type="monotone" dataKey="totalreportingsdp" stroke={COLORS[2]} name="Total Reporting SDP" dot={false} />
+            {selectedVars.nac_wraadj_total_imp && (
+              <Line 
+                type="monotone" 
+                dataKey="nac_wraadj_total_imp"
+                stroke={COLORS[1]} 
+                strokeWidth={2}
+                name="NAC per 1000 WRA" 
+                dot={false} 
+              />
             )}
-            {selectedVars.nac_wraadj_total && (
-              <Line type="monotone" dataKey="nac_wraadj_total" stroke={COLORS[3]} name="NAC Wrap Adj Total" dot={false} />
+            {selectedVars.nac_wraadj_int && (
+              <Line 
+                type="monotone" 
+                dataKey="nac_wraadj_int" 
+                stroke={COLORS[2]} 
+                strokeWidth={2}
+                name="NAC per 1000 WRA with intervention (model)" 
+                dot={false} 
+              />
             )}
-            {selectedVars.nac_alladj_total_imp && (
-              <Line type="monotone" dataKey="nac_alladj_total_imp" stroke={COLORS[4]} name="NAC All Adj Total (Imp)" dot={false} />
-            )}
-            {selectedVars.nac_alladj_total && (
-              <Line type="monotone" dataKey="nac_alladj_total" stroke={COLORS[5]} name="NAC All Adj Total" dot={false} />
+            {selectedVars.nac_wraadj_noint && (
+              <Line 
+                type="monotone" 
+                dataKey="nac_wraadj_noint" 
+                stroke={COLORS[3]} 
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                name="NAC per 1000 WRA with no intervention (dashed)" 
+                dot={false} 
+              />
             )}
           </LineChart>
         </ResponsiveContainer>
@@ -160,19 +246,17 @@ const DashboardContent = ({ onLogout }) => {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCities, setSelectedCities] = useState([]);
   const [selectedVars, setSelectedVars] = useState({
-    nac_wraadj_total_imp: true,
     totalreportingsdp_imp: true,
-    totalreportingsdp: true,
-    nac_wraadj_total: true,
-    nac_alladj_total_imp: true,
-    nac_alladj_total: true
+    nac_wraadj_total_imp: true,
+    nac_wraadj_int: true,
+    nac_wraadj_noint: true
   });
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const SHEET_ID = '1lcU9KEq9jpON6d1-5ojDgDMcdLmcKrUVPG1GQENb2bk';
-        const SHEET_GID = '1631110357';
+        const SHEET_ID = '1ute_A9t0CBvWwwvMPGwz6OSGeQO6_qV8';
+        const SHEET_GID = '972210733';
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
         
         const response = await fetch(url);
@@ -270,7 +354,13 @@ const DashboardContent = ({ onLogout }) => {
                   onChange={() => handleVarChange(variable)}
                   className="mr-2"
                 />
-                <span style={{ color: COLORS[idx] }}>{variable}</span>
+                <span style={{ color: COLORS[idx] }}>
+                  {variable === 'totalreportingsdp_imp' ? 'Total reporting SDPs' :
+                   variable === 'nac_wraadj_total_imp' ? 'NAC per 1000 WRA' :
+                   variable === 'nac_wraadj_int' ? 'NAC per 1000 WRA with intervention (model)' :
+                   variable === 'nac_wraadj_noint' ? 'NAC per 1000 WRA with no intervention (dashed)' :
+                   variable}
+                </span>
               </label>
             ))}
           </div>
