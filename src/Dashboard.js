@@ -281,7 +281,7 @@ const DashboardContent = ({ onLogout }) => {
       }
     };
 
-    await loadData();
+    loadData();
   }, []);
 
   useEffect(() => {
